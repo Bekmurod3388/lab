@@ -11,6 +11,13 @@ use Illuminate\Support\Arr;
 
 class UserController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:role-create', ['only' => ['create','store']]);
+        $this->middleware('permission:role-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:role-delete', ['only' => ['destroy']]);
+    }
 
 public function index()
 {
@@ -28,7 +35,7 @@ return view('admin.users.create',compact('roles'));
 
 public function store(Request $request)
 {
-$this->validate($request, [
+    $this->validate($request, [
 'name' => 'required',
 'email' => 'required|email|unique:users,email',
 'password' => 'required|same:confirm-password',
@@ -57,7 +64,7 @@ $user = User::find($id);
 $roles = Role::pluck('name','name')->all();
 $userRole = $user->roles->pluck('name','name')->all();
 
-return view('admin.users.form',compact('user','roles','userRole'));
+return view('admin.users.edit',compact('user','roles','userRole'));
 }
 
 public function update(Request $request, $id)

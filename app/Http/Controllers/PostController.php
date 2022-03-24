@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -17,10 +18,10 @@ class PostController extends Controller
 
     function __construct()
     {
-        $this->middleware('permission:product-list|product-create|product-edit|product-delete', ['only' => ['index','show']]);
-        $this->middleware('permission:product-create', ['only' => ['create','store']]);
-        $this->middleware('permission:product-edit', ['only' => ['edit','update']]);
-        $this->middleware('permission:product-delete', ['only' => ['destroy']]);
+        $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:role-create', ['only' => ['create','store']]);
+        $this->middleware('permission:role-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:role-delete', ['only' => ['destroy']]);
     }
 
     public function index()
@@ -49,7 +50,7 @@ class PostController extends Controller
     {
         $request->validate([
             'header' => 'required',
-            'description' => 'required',
+            'text' => 'required',
             'img' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:16000',
         ]);
         $uuid = Str::uuid()->toString();
@@ -57,7 +58,7 @@ class PostController extends Controller
         $request->img->move(public_path('../storage/app/public/posts'), $fileName);
         Post::create([
             'header' => $request->header,
-            'description' => $request->description,
+            'text' => $request->text,
             'img' => $fileName,
 
 
@@ -103,7 +104,7 @@ class PostController extends Controller
     {
         $request->validate([
             'header' => 'required',
-            'description' => 'required',
+            'text' => 'required',
             'img' => '',
         ]);
         if ($request->hasFile('img')) {
@@ -112,7 +113,7 @@ class PostController extends Controller
             $request->img->move(public_path('../storage/app/public/posts'), $fileName);
             $post->update([
                 'header' => $request->header,
-                'description' => $request->description,
+                'text' => $request->text,
                 'img' => $fileName,
             ]);
         } else {
